@@ -44,10 +44,9 @@ def poll_workouts(event, context):
     if not isinstance(target_workouts, (list,)):
         target_workouts = [target_workouts]
 
-    min_date = _get_min_date(delta)
-    max_date = _get_max_date(max_delta, min_date)
-    schedules = arbot_api.get_schedule(datetime.datetime.strftime(min_date, '%Y-%m-%d'))
-    filtered_schedules = _filter_schedules(schedules, target_workouts, min_date, max_date)
+    delta_date = _get_delta_date(delta)
+    schedules = arbot_api.get_schedule(datetime.datetime.strftime(delta_date, '%Y-%m-%d'))
+    filtered_schedules = _filter_schedules(schedules, target_workouts, delta_date, max_delta)
     if not filtered_schedules:
         logger.info('no workouts to sign up for')
         return {
@@ -62,18 +61,13 @@ def poll_workouts(event, context):
     }
 
 
-def _get_min_date(delta):
+def _get_delta_date(delta):
     tz = pytz.timezone('Asia/Jerusalem')
-    min_date = datetime.datetime.now(tz) + datetime.timedelta(hours=delta)
-    return min_date
+    delta_date = datetime.datetime.now(tz) + datetime.timedelta(hours=delta)
+    return delta_date
 
 
-def _get_max_date(max_delta, min_date):
-    max_date = min_date + datetime.timedelta(hours=max_delta)
-    return max_date
-
-
-def _filter_schedules(schedules, target_workouts, min_date, max_date):
+def _filter_schedules(schedules, target_workouts, delta_date, max_delta):
     filtered = []
     for schedule in schedules:
         name = schedule.get('category', {}).get('name', None)
@@ -92,12 +86,12 @@ def _filter_schedules(schedules, target_workouts, min_date, max_date):
             continue
 
         schedule_time = datetime.datetime.strptime('{} {} +0200'.format(date, time), '%Y-%m-%d %H:%M:%S %z')
-        if min_date < schedule_time:
-            logger.info('not registering. schedule {} at {} is later than {}'.format(name, schedule_time, min_date))
+        if schedule_time > delta_date:
+            logger.info('not registering. schedule {} at {} is after {}'.format(name, schedule_time, delta_date))
             continue
 
-        if schedule_time < max_date:
-            logger.info('not registering. schedule {} at {} is earlier than {}'.format(name, schedule_time, min_date))
+        if schedule_time + datetime.timedelta(hours=max_delta):
+            logger.info('not registering. schedule {} at {} + {} hours is before {}'.format(name, schedule_time, max_delta, delta_date))
             continue
 
         already_member = schedule['alreadyMember']
