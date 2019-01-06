@@ -90,7 +90,7 @@ def _filter_schedules(schedules, target_workouts, delta_date, max_delta):
             logger.info('not registering. schedule {} at {} is after {}'.format(name, schedule_time, delta_date))
             continue
 
-        if schedule_time + datetime.timedelta(hours=max_delta):
+        if schedule_time + datetime.timedelta(hours=max_delta) < delta_date:
             logger.info('not registering. schedule {} at {} + {} hours is before {}'.format(name, schedule_time, max_delta, delta_date))
             continue
 
