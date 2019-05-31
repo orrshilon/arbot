@@ -37,14 +37,14 @@ class ArbotApi(object):
         self._box_location = content['user']['locationBox']['location']
 
     def get_schedule(self, date):
-        path = 'scheduleByDate/{}'.format(self._box_id)
+        path = 'scheduleByDateList/{}'.format(self._box_id)
         params = {
             'date': date,
             'userId': self._user_id
         }
         schedule = self._get_with_authentication(path, params=params)
-        if self._box_location in schedule:
-            return schedule[self._box_location][0]
+        if 'סטודיו' in schedule:
+            return schedule['סטודיו'][0]
         return schedule
 
     def get_membership(self):
