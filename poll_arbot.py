@@ -70,7 +70,7 @@ def _get_delta_date(delta):
 def _filter_schedules(schedules, target_workouts, delta_date, max_delta):
     filtered = []
     for schedule in schedules:
-        name = schedule.get('category', {}).get('name', None)
+        name = schedule.get('category', None)
         if not name:
             logger.warning('not registering. could not find a workout name in schedule {}'.format(schedule))
             continue
@@ -85,7 +85,7 @@ def _filter_schedules(schedules, target_workouts, delta_date, max_delta):
             logger.warning('not registering. could not find a workout time in schedule {}'.format(schedule))
             continue
 
-        schedule_time = datetime.datetime.strptime('{} {} +0200'.format(date, time), '%Y-%m-%d %H:%M:%S %z')
+        schedule_time = datetime.datetime.strptime('{} {} +0300'.format(date, time), '%Y-%m-%d %H:%M:%S %z')
         if schedule_time > delta_date:
             logger.info('not registering. schedule {} at {} is after {}'.format(name, schedule_time, delta_date))
             continue
@@ -119,7 +119,7 @@ def _handle_successful_registration(filtered_schedule, result):
 
 
 def _send_success_email(filtered_schedule, result):
-    name = filtered_schedule.get('category', {}).get('name', None)
+    name = filtered_schedule.get('category', None)
     time = filtered_schedule.get('schedule', {}).get('time', None)
     date = filtered_schedule.get('schedule', {}).get('date', None)
     email_api.send_email(
