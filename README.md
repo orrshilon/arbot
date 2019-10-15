@@ -3,7 +3,7 @@
 Sign up for workouts automatically.
 
 ## Usage
-1. deply
+1. deploy
     1. clone repository: `git clone https://github.com/orrshilon/arbot.git`
     1. download requirements: `pip install -r requirements.txt` 
     1. [package requirements](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html#python-package-dependencies)
